@@ -18,6 +18,8 @@ let mesh;
 
 const origin = new THREE.Vector3(0, 0, 0);
 
+const BonesActive = true;
+
 Main = {};
 //-----------------------------------------------------------------------
 Main.Start = function () {
@@ -54,8 +56,12 @@ Main.renderScenes = function renderScenes() {
   //Main render.
   //camera_controls.update();
   //update();
-  
-  bones_update();
+
+  if (BonesActive)
+    bones_update();
+
+
+
   orbit.update();
   //helper.update();
   //stats.update();
@@ -87,7 +93,7 @@ function initScene() {
 
   THREEx.WindowResize(renderer, camera);
 
-  document.body.appendChild(renderer.domElement);
+
 
 
   const gridHelper = new THREE.GridHelper(40, 10);
@@ -154,68 +160,66 @@ function initScene() {
   rightLegGeometry.translate(-2, -12, 0);
 
   const humanGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries([bodyGeometry, headGeometry, leftArmGeometry, rightArmGeometry, leftLegGeometry, rightLegGeometry]);
-  const position = humanGeometry.attributes.position;
+  
+  const position = geometry.attributes.position;
+  const vertex = new Vector3();
+	const skinIndices = [];
+	const skinWeights = [];
 
-  /*
-  const skinIndices = [];
-  const skinWeights = [];
+  if (BonesActive) {
+    /*
+ const skinIndices = [];
+ const skinWeights = [];
 
-  // 6 geometries, 6 bones, 8 vertices per geometry
-  for (let boneIndex = 0; boneIndex < 6; boneIndex += 1) {
-      for (let vertexIndex = 0; vertexIndex < 8; vertexIndex += 1) {
-          skinIndices.push(new THREE.Vector4(boneIndex, 0, 0, 0));
-          skinWeights.push(new THREE.Vector4(1, 0, 0, 0));
-      }
-  }
+ // 6 geometries, 6 bones, 8 vertices per geometry
+ for (let boneIndex = 0; boneIndex < 6; boneIndex += 1) {
+     for (let vertexIndex = 0; vertexIndex < 8; vertexIndex += 1) {
+         skinIndices.push(new THREE.Vector4(boneIndex, 0, 0, 0));
+         skinWeights.push(new THREE.Vector4(1, 0, 0, 0));
+     }
+ }
 
 
-  humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
-  humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
- */
+ humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+ humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
+*/
 
-  const skinIndices = [];
-  const skinWeights = [];
     // 6 geometries, 6 bones, 8 vertices per geometry
     for (let boneIndex = 0; boneIndex < 6; boneIndex += 1) {
       for (let vertexIndex = 0; vertexIndex < 8; vertexIndex += 1) {
-        skinIndices.push(new THREE.Vector4(boneIndex, 0, 0, 0));
-        skinWeights.push(new THREE.Vector4(1, 0, 0, 0));
+        skinIndices.push(boneIndex, 0, 0);
+        skinWeights.push(1, 0, 0);
       }
     }
+    humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 3));
+    humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 3));
 
-  humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
-  humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 3));
+    const material = new THREE.MeshBasicMaterial({
+      skinning: true,
+      wireframe: true,
+    });
 
-/*
-  const material = new THREE.MeshPhongMaterial({
-    color: 0x156289,
-    emissive: 0x072534,
-    side: THREE.DoubleSide,
-    flatShading: true
-  });
-*/
+    mesh = new THREE.SkinnedMesh(humanGeometry, material);
+    mesh.add(bodyBone);
+    mesh.bind(skeleton);
+    scene.add(mesh);
+    helper = new THREE.SkeletonHelper(mesh);
+    helper.material.linewidth = 10; // Not working ?
+    scene.add(helper);
 
-  const material = new THREE.MeshBasicMaterial({
-    skinning: true,
-    wireframe: true,
-  });
+  }
+  else {
 
+    const material = new THREE.MeshBasicMaterial({
+      skinning: false,
+      wireframe: true,
+    });
 
-  
-  mesh = new THREE.SkinnedMesh(humanGeometry, material);
- 
-  mesh.add(bodyBone);
-  mesh.bind(skeleton);
- 
-  scene.add(mesh);
-    
+    mesh = new THREE.Mesh(humanGeometry, material);
+    scene.add(mesh);
 
+  }
 
-  //mesh = new THREE.Mesh(humanGeometry, material);
-  //scene.add(mesh);
-  helper = new THREE.SkeletonHelper(mesh);
-  helper.material.linewidth = 4; // Not working ?
-  scene.add(helper);
 }
 //-----------------------------------------------------------------------
 function bones_update() {
@@ -238,8 +242,6 @@ function bones_update() {
 
   // Right leg
   bones[5].rotation.x = (Math.PI * angle) / 4;
-
-
 }
 
 
