@@ -19,13 +19,15 @@ let mesh;
 const origin = new THREE.Vector3(0, 0, 0);
 
 const BonesActive = true;
+const ComplexBones = true;
+
 
 Main = {};
 //-----------------------------------------------------------------------
 Main.Start = function () {
 
   //setTimeout(Main.Start, 4000);
-  Canvas.init();
+  
   Main.Init();
   Main.animate();
 
@@ -33,7 +35,18 @@ Main.Start = function () {
 //-----------------------------------------------------------------------
 Main.Init = function () {
   //initStats();
+  Canvas.init();
   initScene();
+
+  if (ComplexBones==true)
+  {
+    ComplexBonesInit();
+  }
+  else
+  {
+    SimpleBonesInit();
+  }
+
 }
 //-----------------------------------------------------------------------
 Main.animate = function () {
@@ -58,8 +71,17 @@ Main.renderScenes = function renderScenes() {
   //update();
 
   if (BonesActive)
-    bones_update();
+  {
+    if (ComplexBones == true)
+    {
+      complex_bones_update(); 
+      
 
+    }
+    else{
+       // PLACE HOLDER
+    }
+  }
 
 
   orbit.update();
@@ -67,17 +89,6 @@ Main.renderScenes = function renderScenes() {
   //stats.update();
   renderer.render(scene, camera);
 }
-//-----------------------------------------------------------------------
-/*
-function initStats() {
-    stats = new Stats();
-    stats.domElement.style.position = 'absolute';
-    stats.domElement.style.left = '0px';
-    stats.domElement.style.top = '20px';
-    stats.setMode(0); // 0: fps, 1: ms
-    document.getElementById('stats').appendChild(stats.domElement);
-  }
-*/
 //-----------------------------------------------------------------------
 function initScene() {
   scene = new THREE.Scene();
@@ -88,31 +99,21 @@ function initScene() {
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: Canvas.MainCanvas });
   renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-
   orbit = new THREE.OrbitControls(camera, Canvas.MainCanvas);
-
   THREEx.WindowResize(renderer, camera);
-
-
-
-
   const gridHelper = new THREE.GridHelper(40, 10);
   scene.add(gridHelper);
-
-
-
   lights = [];
   lights[0] = new THREE.PointLight(0xffffff, 1);
   lights[1] = new THREE.PointLight(0xffffff, 1);
-
-
   lights[0].position.set(200, 300, 400);
   lights[1].position.set(-200, -300, -400);
-
-
   scene.add(lights[0]);
   scene.add(lights[1]);
-
+}
+//-----------------------------------------------------------------------
+function ComplexBonesInit()
+{
 
   const bodyBone = new THREE.Bone();
   const headBone = new THREE.Bone();
@@ -161,44 +162,26 @@ function initScene() {
 
   const humanGeometry = THREE.BufferGeometryUtils.mergeBufferGeometries([bodyGeometry, headGeometry, leftArmGeometry, rightArmGeometry, leftLegGeometry, rightLegGeometry]);
   
-  const position = geometry.attributes.position;
-  const vertex = new Vector3();
+  const position = humanGeometry.attributes.position;
+  const vertex = new THREE.Vector3();
 	const skinIndices = [];
 	const skinWeights = [];
 
   if (BonesActive) {
-    /*
- const skinIndices = [];
- const skinWeights = [];
-
- // 6 geometries, 6 bones, 8 vertices per geometry
- for (let boneIndex = 0; boneIndex < 6; boneIndex += 1) {
-     for (let vertexIndex = 0; vertexIndex < 8; vertexIndex += 1) {
-         skinIndices.push(new THREE.Vector4(boneIndex, 0, 0, 0));
-         skinWeights.push(new THREE.Vector4(1, 0, 0, 0));
-     }
- }
-
-
- humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
- humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
-*/
-
     // 6 geometries, 6 bones, 8 vertices per geometry
     for (let boneIndex = 0; boneIndex < 6; boneIndex += 1) {
       for (let vertexIndex = 0; vertexIndex < 8; vertexIndex += 1) {
-        skinIndices.push(boneIndex, 0, 0);
-        skinWeights.push(1, 0, 0);
+        skinIndices.push(boneIndex,boneIndex+1, 0, 0);
+        skinWeights.push(1, 0, 0,0 );
       }
     }
-    humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 3));
-    humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 3));
+    humanGeometry.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
+    humanGeometry.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
 
     const material = new THREE.MeshBasicMaterial({
       skinning: true,
       wireframe: true,
     });
-
     mesh = new THREE.SkinnedMesh(humanGeometry, material);
     mesh.add(bodyBone);
     mesh.bind(skeleton);
@@ -206,23 +189,37 @@ function initScene() {
     helper = new THREE.SkeletonHelper(mesh);
     helper.material.linewidth = 10; // Not working ?
     scene.add(helper);
-
   }
   else {
-
     const material = new THREE.MeshBasicMaterial({
       skinning: false,
       wireframe: true,
     });
-
     mesh = new THREE.Mesh(humanGeometry, material);
     scene.add(mesh);
-
   }
 
 }
 //-----------------------------------------------------------------------
-function bones_update() {
+function SimpleBonesInit()
+{
+
+  bones = [];
+
+  const RootBone= THREE.Bone();
+  bones.push(RootBone);
+  
+  RootBone.position.y = 0;
+  SecondBone.position.y= 10;
+  const armSkeleton = THREE.Skeleton(bones);
+
+
+  const bodyGeometry = new THREE.BoxGeometry(10, 10,  10, 1, 1, 1);
+
+
+}
+//-----------------------------------------------------------------------
+function complex_bones_update() {
   const time = Date.now() * 0.001;
   const angle = Math.sin(time);
 
