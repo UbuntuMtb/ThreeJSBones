@@ -19,7 +19,7 @@ let mesh;
 const origin = new THREE.Vector3(0, 0, 0);
 
 const BonesActive = true;
-const ComplexBones = true;
+const ComplexBones = false;
 
 
 Main = {};
@@ -204,17 +204,18 @@ function ComplexBonesInit()
 function SimpleBonesInit()
 {
 
-  bones = [];
+  const geometry = new THREE.BoxGeometry( 8, 8, 8 );
 
-  const RootBone= THREE.Bone();
-  bones.push(RootBone);
+  const wireframe = new THREE.WireframeGeometry( geometry );
   
-  RootBone.position.y = 0;
-  SecondBone.position.y= 10;
-  const armSkeleton = THREE.Skeleton(bones);
+  const line = new THREE.LineSegments( wireframe );
+  line.material.depthTest = false;
+  line.material.opacity = 1.0;
+  line.material.transparent = true;
 
 
-  const bodyGeometry = new THREE.BoxGeometry(10, 10,  10, 1, 1, 1);
+
+  scene.add( line );
 
 
 }
