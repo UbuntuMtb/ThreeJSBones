@@ -79,7 +79,7 @@ Main.renderScenes = function renderScenes() {
 
     }
     else{
-       // PLACE HOLDER
+      simple_bones_update();
     }
   }
 
@@ -204,18 +204,73 @@ function ComplexBonesInit()
 function SimpleBonesInit()
 {
 
-  const geometry = new THREE.BoxGeometry( 8, 8, 8 );
 
-  const wireframe = new THREE.WireframeGeometry( geometry );
+  const bodyBone = new THREE.Bone();
+  //const headBone = new THREE.Bone();
+
+
+  bodyBone.position.set(0,-4, 0);
+  //headBone.position.set(0, 8, 0);
+
+
+  //bodyBone.add(headBone);
   
+  const bones = [];
+  bones.push(bodyBone);
+  //bones.push(headBone);
+
+
+
+  const geometry = new THREE.BoxGeometry( 8, 8, 8 );
+  const position = geometry.attributes.position;
+
+  const vertex = new THREE.Vector3();
+
+  const skinIndices = [];
+  const skinWeights = [];
+  
+  //Section to display wireframe.
+  
+  const wireframe = new THREE.WireframeGeometry( geometry );
   const line = new THREE.LineSegments( wireframe );
   line.material.depthTest = false;
   line.material.opacity = 1.0;
   line.material.transparent = true;
-
-
-
   scene.add( line );
+
+
+  //Attach bones to the geometry 
+  for ( let i=0; i< position.count; i++)
+  {
+    vertex.fromBufferAttribute(position, i);
+    skinIndices.push( 0, 1, 0, 0 );
+		skinWeights.push( 1, 0, 0, 0 );
+  }
+
+  geometry.setAttribute( 'skinIndex', new THREE.Uint16BufferAttribute( skinIndices, 4 ) );
+	geometry.setAttribute( 'skinWeight', new THREE.Float32BufferAttribute( skinWeights, 4 ) );
+
+
+	const material = new THREE.MeshPhongMaterial( {
+    color: 0x156289,
+    emissive: 0x072534,
+    side: THREE.DoubleSide,
+    flatShading: true
+  } );
+
+  mesh = new THREE.SkinnedMesh( geometry,	material );
+  const skeleton = new THREE.Skeleton( bones );
+
+  mesh.add( bones[ 0 ] );
+
+  mesh.bind( skeleton );
+  scene.add(mesh);
+
+  skeletonHelper = new THREE.SkeletonHelper( mesh );
+  skeletonHelper.material.linewidth = 2;
+  scene.add( skeletonHelper );
+
+  
 
 
 }
@@ -243,4 +298,13 @@ function complex_bones_update() {
 }
 
 
+function simple_bones_update() {
+  const time = Date.now() * 0.001;
+  const angle = Math.sin(time);
 
+  const bones = mesh.skeleton.bones;
+
+  // Body
+  bones[0].rotation.y = (Math.PI * angle) / 8;
+  bones[0].rotation.z = -(Math.PI * angle) / 8;
+}
