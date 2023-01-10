@@ -206,22 +206,22 @@ function SimpleBonesInit()
 
 
   const bodyBone = new THREE.Bone();
-  //const headBone = new THREE.Bone();
+  const headBone = new THREE.Bone();
 
 
-  bodyBone.position.set(0,-4, 0);
-  //headBone.position.set(0, 8, 0);
+  bodyBone.position.set(0, -3, 0);
+  headBone.position.set(0, 6, 0);
 
 
-  //bodyBone.add(headBone);
+  bodyBone.add(headBone);
   
   const bones = [];
   bones.push(bodyBone);
-  //bones.push(headBone);
+  bones.push(headBone);
 
 
 
-  const geometry = new THREE.BoxGeometry( 8, 8, 8 );
+  const geometry = new THREE.BoxGeometry( 1, 6, 1 );
   const position = geometry.attributes.position;
 
   const vertex = new THREE.Vector3();
@@ -231,13 +231,14 @@ function SimpleBonesInit()
   
   //Section to display wireframe.
   
+  /*
   const wireframe = new THREE.WireframeGeometry( geometry );
   const line = new THREE.LineSegments( wireframe );
   line.material.depthTest = false;
   line.material.opacity = 1.0;
   line.material.transparent = true;
   scene.add( line );
-
+*/
 
   //Attach bones to the geometry 
   for ( let i=0; i< position.count; i++)
@@ -264,6 +265,10 @@ function SimpleBonesInit()
   mesh.add( bones[ 0 ] );
 
   mesh.bind( skeleton );
+
+  mesh.position.x=0;
+  mesh.position.y=3;
+  mesh.position.z=0;
   scene.add(mesh);
 
   skeletonHelper = new THREE.SkeletonHelper( mesh );
@@ -305,6 +310,6 @@ function simple_bones_update() {
   const bones = mesh.skeleton.bones;
 
   // Body
-  bones[0].rotation.y = (Math.PI * angle) / 8;
-  bones[0].rotation.z = -(Math.PI * angle) / 8;
+  bones[0].rotation.z= (Math.PI * angle) / 8;
+  
 }
