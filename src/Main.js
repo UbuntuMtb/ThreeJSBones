@@ -216,7 +216,11 @@ function SimpleBonesInit() {
     {
       target: 5, // "target"
       effector: 4, // "bone3"
-      links: [{ index: 3  , limitation : new THREE.Vector3( 0, 0, 1 ) , rotationMin : new THREE.Vector3(0,0,-3.14159/2) , rotationMax: new THREE.Vector3(0,0,3.14159/2) }, { index: 2, limitation : new THREE.Vector3( 0, 0, 1 ) , rotationMin : new THREE.Vector3(0,0,-3.14159 /2) , rotationMax: new THREE.Vector3(0,0,3.14159/2) }, { index: 1, limitation : new THREE.Vector3( 0, 1, 0 ) }] // "bone2", "bone1", "bone0"
+      links: [   { index: 3  , limitation : new THREE.Vector3( 0, 0, 1 ) },  
+                 { index: 2  , limitation : new THREE.Vector3( 0, 0, 1 ) }, 
+                 { index: 1  , limitation : new THREE.Vector3( 0, 1, 0 ) }
+              ], // "bone2", "bone1", "bone0"
+      iteration: 0.5
     }
   ];
   ikSolver = new THREE.CCDIKSolver(mesh, iks);
