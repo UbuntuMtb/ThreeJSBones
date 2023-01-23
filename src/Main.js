@@ -129,9 +129,9 @@ function SimpleBonesInit() {
 
 
 
-  const link1_geom = new THREE.BoxGeometry(1, 6, 1);
-  const link2_geom = new THREE.BoxGeometry(1, 6, 1);
-  const link3_geom = new THREE.BoxGeometry(1, 6, 1);
+  const link1_geom = new THREE.BoxGeometry(0.05, 6, 0.05 );
+  const link2_geom = new THREE.BoxGeometry(0.05, 6, 0.05);
+  const link3_geom = new THREE.BoxGeometry(0.05, 6, 0.05);
 
   link1_geom.translate(0, 0, 0);
   link2_geom.translate(0, 6, 0);
