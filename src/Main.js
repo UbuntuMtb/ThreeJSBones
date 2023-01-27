@@ -37,22 +37,13 @@ Main.Init = function () {
   //initStats();
   Canvas.init();
   initScene();
-
-
   SimpleBonesInit();
-
 
 }
 //-----------------------------------------------------------------------
 Main.animate = function () {
-  // THIS IS THE MAIN ANIMATION LOOP
-  // note: three.js includes requestAnimationFrame shim
-  // alternative to using setInterval for updating in-browser drawing
-  // this effectively requests that the animate function be called again for next draw
-  // http://learningwebgl.com/blog/?p=3189
+
   requestAnimationFrame(Main.animate);
-
-
 
   // update camera position and render scene
   //TODO: NPBP00 This functions has to be modified to configure depending on user choices.
@@ -64,7 +55,7 @@ Main.renderScenes = function renderScenes() {
   //Main render.
 
   simple_bones_update();
-  orbit.update();  
+  orbit.update();
   renderer.render(scene, camera);
 }
 //-----------------------------------------------------------------------
@@ -78,6 +69,20 @@ function initScene() {
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: Canvas.MainCanvas });
   renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
   orbit = new THREE.OrbitControls(camera, Canvas.MainCanvas);
+
+
+
+  control = new THREE.TransformControls(
+    camera,
+    Canvas.MainCanvas,
+  );
+  control.space = 'world';
+  control.addEventListener('mouseDown', () => orbit.enabled = false);
+  control.addEventListener('mouseUp', () => orbit.enabled = true);
+  scene.add(control);
+
+
+
   THREEx.WindowResize(renderer, camera);
   const gridHelper = new THREE.GridHelper(40, 10);
   scene.add(gridHelper);
@@ -125,13 +130,9 @@ function SimpleBonesInit() {
   BaseLinkBone.add(targetBone);
   bones.push(targetBone);
 
-
-
-
-
-  const link1_geom = new THREE.BoxGeometry(0.05, 6, 0.05 );
-  const link2_geom = new THREE.BoxGeometry(0.05, 6, 0.05);
-  const link3_geom = new THREE.BoxGeometry(0.05, 6, 0.05);
+  const link1_geom = new THREE.BoxGeometry(1.0, 6, 1.0);
+  const link2_geom = new THREE.BoxGeometry(1.0, 6, 1.0);
+  const link3_geom = new THREE.BoxGeometry(1.0, 6, 1.0);
 
   link1_geom.translate(0, 0, 0);
   link2_geom.translate(0, 6, 0);
@@ -143,26 +144,10 @@ function SimpleBonesInit() {
 
   const arm_geom = THREE.BufferGeometryUtils.mergeBufferGeometries([link1_geom, link2_geom, link3_geom]);
 
-
-
-
-  //const position = geometry.attributes.position;
-
   const vertex = new THREE.Vector3();
 
   const skinIndices = [];
   const skinWeights = [];
-
-  //Section to display wireframe.
-
-  /*
-  const wireframe = new THREE.WireframeGeometry( geometry );
-  const line = new THREE.LineSegments( wireframe );
-  line.material.depthTest = false;
-  line.material.opacity = 1.0;
-  line.material.transparent = true;
-  scene.add( line );
-*/
 
   //Attach bones to the geometry 
   for (let i = 0; i < link1_vertices.count; i++) {
@@ -187,7 +172,6 @@ function SimpleBonesInit() {
   arm_geom.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(skinIndices, 4));
   arm_geom.setAttribute('skinWeight', new THREE.Float32BufferAttribute(skinWeights, 4));
 
-
   const material = new THREE.MeshPhongMaterial({
     color: 0x156289,
     emissive: 0x072534,
@@ -197,9 +181,7 @@ function SimpleBonesInit() {
 
   mesh = new THREE.SkinnedMesh(arm_geom, material);
   const skeleton = new THREE.Skeleton(bones);
-
   mesh.add(bones[0]);
-
   mesh.bind(skeleton);
 
   mesh.position.x = 0;
@@ -207,89 +189,29 @@ function SimpleBonesInit() {
   mesh.position.z = 0;
   scene.add(mesh);
 
-  //skeletonHelper = new THREE.SkeletonHelper(mesh);
-  //skeletonHelper.material.linewidth = 2;
-  //scene.add(skeletonHelper);
+  control.attach(targetBone);
+  scene.add(control);
 
+  skeletonHelper = new THREE.SkeletonHelper(mesh);
+  skeletonHelper.material.linewidth = 2;
+  scene.add(skeletonHelper);
 
   const iks = [
     {
       target: 5, // "target"
       effector: 4, // "bone3"
-      links: [   { index: 3  , limitation : new THREE.Vector3( 0, 0, 1 ) },  
-                 { index: 2  , limitation : new THREE.Vector3( 0, 0, 1 ) }, 
-                 { index: 1  , limitation : new THREE.Vector3( 0, 1, 0 ) }
-              ], // "bone2", "bone1", "bone0"
+      links: [{ index: 3, limitation: new THREE.Vector3(0, 0, 0) },  //Fixed to troubleshoot.  
+      { index: 2, limitation: new THREE.Vector3(0, 0, 1) },
+      { index: 1, limitation: new THREE.Vector3(0, 1, 0), rotationMax: new THREE.Vector3(0, Math.PI / 2, 0), rotationMin: new THREE.Vector3(0, -Math.PI / 2, 0) }
+      ], // "bone2", "bone1", "bone0"
       iteration: 0.5
     }
   ];
   ikSolver = new THREE.CCDIKSolver(mesh, iks);
 
-
-
-  //EFgeom = new THREE.SphereGeometry( 0.8, 32, 16 );
-  //EFmaterial = new THREE.MeshBasicMaterial( { color: 0x156289 } );
-  //EFsphere = new THREE.Mesh( EFgeom, EFmaterial );
-  //scene.add( EFsphere );
-
-
-  TGgeom = new THREE.SphereGeometry(0.8, 32, 16);
-  TGmaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-  TGsphere = new THREE.Mesh(TGgeom, TGmaterial);
-  scene.add(TGsphere);
-
-
-
-
 }
 //-----------------------------------------------------------------------
-function complex_bones_update() {
-  const time = Date.now() * 0.001;
-  const angle = Math.sin(time);
-
-  const bones = mesh.skeleton.bones;
-
-  // Head
-  bones[1].rotation.y = (Math.PI * angle) / 8;
-
-  // Left arm
-  bones[2].rotation.x = (Math.PI * angle) / 4;
-
-  // Right arm
-  bones[3].rotation.x = -(Math.PI * angle) / 4;
-
-  // Left leg
-  bones[4].rotation.x = -(Math.PI * angle) / 4;
-
-  // Right leg
-  bones[5].rotation.x = (Math.PI * angle) / 4;
-}
-
-
 function simple_bones_update() {
-
-  const time = Date.now() * 0.0005;
-  const angle = Math.sin(time);
-
-  const bones = mesh.skeleton.bones;
-
-
-
-  //EFsphere.position.x = twinGlobalPos.x;
-  //EFsphere.position.y = twinGlobalPos.y;
-  //EFsphere.position.z = twinGlobalPos.z;
-
-
-  // Body
-  bones[5].position.y = 12;
-  bones[5].position.x = 5 + 15 * angle;
-  bones[5].position.z = 5+ 7 * angle;
-
-  TGsphere.position.x = bones[5].position.x;
-  TGsphere.position.y = bones[5].position.y;
-  TGsphere.position.z = bones[5].position.z;
-
   ikSolver?.update();
-
-
 }
+//-----------------------------------------------------------------------
