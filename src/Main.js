@@ -15,8 +15,6 @@ let lights;
 let helper;
 let gridHelper;
 
-let mesh;
-
 const origin = new THREE.Vector3(0, 0, 0);
 
 let cube = {};
@@ -39,15 +37,11 @@ Main.Start = function () {
 Main.animate = function (time) {
   time *= 0.0005;  // convert time to seconds
  
-  //cube2.rotation.x = time;
-  //cube2.rotation.y = time;
   cube2.rotation.x = time;
   cube3.rotation.y = time;
   cube4.rotation.z = time;
   cube.rotation.z = time;
 
-  // update camera position and render scene
-  //TODO: NPBP00 This functions has to be modified to configure depending on user choices.
   orbit.update();
   renderer.render(scene, camera);
 
@@ -61,7 +55,6 @@ Main.InitScene = function () {
   renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 
   camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-  //camera.position.set(20, 30, 40);
   camera.position.set(0, 10, 15);
   camera.lookAt(origin);
 
