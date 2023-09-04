@@ -14,6 +14,8 @@ To have autocomplete and intellisense working for this javascript project:
 * Update "main" entry in package.json file to the main.js file that requires intellisense / autocompletion (MainToyArm.js for now).
 
 To debug without a launch.json file:
+* Install Live Server extension.
+* Press "Go Live" on bottom right status bar to start the local web server.
 * Select the main html page.
 * Click Run and Debug on VSC left bar, then click the play button.
 * If there is a breakpoint in the code, the debugger will stop there.
