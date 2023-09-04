@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="shortcut icon" href="#">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+
+<body style="overflow: hidden">
+    <!--- //////////////////////////////////////////////////
+     /////     JAVASCRIPT INCLUDES
+     ////////////////////////////////////////////////// -->
+    
+    <!-- Three js graphical library -->
+    <!-- Source: https://github.com/mrdoob/three.js.git-->
+    <script src="js/threejs-r147/three.min.js"></script>
+    <!-- threejs camera controls helpers -->
+    <script src="js/threejs-r147/controls/OrbitControls.js"></script> 
+    
+    <!-- three js stats-->
+    <script src="js/threejs-r147/libs/stats.min.js"></script>
+    <!-- CCDIK Solver -->
+    <script src="js/threejs-r147/animation/CCDIKSolver.js"></script>
+    <!-- Loader for STL files -->
+    <script src="js/threejs-r147/loaders/STLLoader.js"></script>
+    <!-- Loader fro collada files -->
+    <script src="js/threejs-r147/loaders/ColladaLoader.js"></script>
+
+    <script src="js/threejs-r147/utils/BufferGeometryUtils.js"></script>
+    <script src="js/threejs-r147/controls/TransformControls.js"></script>
+    
+    <!-- Numeric library -->
+    <!-- Source: https://github.com/sloisel/numeric.git -->
+    <script src="js/numeric-1.2.6/numeric.js"></script>
+
+    <!-- Library for gui interface -->
+    <!-- Source:  https://github.com/dataarts/dat.gui.git -->
+    <script src="js/dat.gui-0.7.9/dat.gui.min.js"></script>
+
+    <!-- Library to manage keyboard events-->
+    <!-- Soruce: https://github.com/jeromeetienne/threex.keyboardstate.git-->
+    <script src="js/threex/threex.keyboardstate-master/threex.keyboardstate.js"></script>
+    <!-- Library to manage windows resize -->
+    <!-- Source: https://github.com/jeromeetienne/threex.windowresize.git -->
+    <script src="js/threex/threex.windowresize-master/threex.windowresize.js"></script>
+    <!-- Library to display solid frames-->
+    <!-- Source: https://github.com/jeromeetienne/threex.solidwireframe.git -->
+    <script src="js/threex/threex.solidwireframe-master/threex.solidwireframe.js"></script>
+    <!-- Library to create AABB collision boxes -->
+    <!-- Source: https://github.com/jeromeetienne/threex.colliders.git-->
+    <script src="js/threex/threex.colliders-master/threex.collider.js"></script>
+    <script src="js/threex/threex.colliders-master/threex.colliderhelper.js"></script>
+    
+    <!-- Library to create clones of objects-->
+    <script type="text/JavaScript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
+    
+    <!-- //////////////////////////////////////////////////
+     /////     JAVASCRIPT APPLICATION CODE
+     ////////////////////////////////////////////////// -->
+    <script src="src/Canvas.js"></script>
+    <script src="src/MainToyArmAngleLimited.js"></script>
+
+
+    
+    <!-- //////////////////////////////////////////////////
+     /////     JAVASCRIPT MAIN
+     ////////////////////////////////////////////////// -->
+    <script>
+
+        //Section to create cavas dynamically
+        
+        document.body.onload = Main.Start;
+
+    </script>
+</body>
+
+
+
+
+
+
+</html>
+
+
